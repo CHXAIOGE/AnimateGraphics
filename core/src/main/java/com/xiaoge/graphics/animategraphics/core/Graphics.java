@@ -4,9 +4,11 @@ import android.util.Log;
 import android.widget.ImageView;
 
 
+import com.xiaoge.graphics.animategraphics.core.loader.GraphicsLoader;
 import com.xiaoge.graphics.animategraphics.core.target.Target;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.HashMap;
 
 /**
@@ -16,7 +18,7 @@ import java.util.HashMap;
 public class Graphics {
 
     private static final String TAG = "Graphics";
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     public static Graphics get() {
         return new Graphics();
@@ -45,23 +47,40 @@ public class Graphics {
             if(module.isSupport(data)) {
                 Class<GraphicsLoader> loader =  encoders.get(module);
                 graphicsLoader = getRegistry().getLoaderInstance(loader, data, target);
-                break;
+                if(graphicsLoader != null) {
+                    break;
+                }
             }
         }
-        Log.d(TAG, "graphicsLoader:"+graphicsLoader);
+        Log.d(TAG, "graphicsLoader:"+(graphicsLoader == null ? "null":graphicsLoader));
         return graphicsLoader;
     }
+
+    public GraphicsLoader load(InputStream data, Target target) throws Exception {
+        GraphicsLoader graphicsLoader = null;
+        HashMap<Module, Class<GraphicsLoader>> encoders = getRegistry().getEncoders();
+
+        for(Module module : encoders.keySet()) {
+            if(module.isSupport(data)) {
+                Class<GraphicsLoader> loader =  encoders.get(module);
+                graphicsLoader = getRegistry().getLoaderInstance(loader, data, target);
+                if(graphicsLoader != null) {
+                    break;
+                }
+            }
+        }
+        Log.d(TAG, "graphicsLoader:"+(graphicsLoader == null ? "null":graphicsLoader));
+        return graphicsLoader;
+    }
+
 
     public Registry getRegistry() {
         return Registry.get();
     }
 
-    public interface GraphicsLoader {
-        void into (ImageView view);
-    }
-
     public interface Module {
         boolean isSupport (File data);
+        boolean isSupport (InputStream data);
     }
 
     public static void Log(String log){
