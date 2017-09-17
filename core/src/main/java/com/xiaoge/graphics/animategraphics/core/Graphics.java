@@ -1,8 +1,6 @@
 package com.xiaoge.graphics.animategraphics.core;
 
 import android.util.Log;
-import android.widget.ImageView;
-
 
 import com.xiaoge.graphics.animategraphics.core.loader.GraphicsLoader;
 import com.xiaoge.graphics.animategraphics.core.target.Target;
@@ -18,7 +16,7 @@ import java.util.HashMap;
 public class Graphics {
 
     private static final String TAG = "Graphics";
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     public static Graphics get() {
         return new Graphics();
@@ -62,11 +60,14 @@ public class Graphics {
 
         for(Module module : encoders.keySet()) {
             if(module.isSupport(data)) {
+                data.reset();
                 Class<GraphicsLoader> loader =  encoders.get(module);
                 graphicsLoader = getRegistry().getLoaderInstance(loader, data, target);
                 if(graphicsLoader != null) {
                     break;
                 }
+            } else {
+                data.reset();
             }
         }
         Log.d(TAG, "graphicsLoader:"+(graphicsLoader == null ? "null":graphicsLoader));
