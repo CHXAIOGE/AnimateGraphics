@@ -42,7 +42,9 @@ public class Graphics {
         HashMap<Module, Class<GraphicsLoader>> encoders = getRegistry().getEncoders();
 
         for(Module module : encoders.keySet()) {
-            if(module.isSupport(data)) {
+            Log.d(TAG, "module:"+module);
+            boolean isSupport = module.isSupport(data);
+            if(isSupport) {
                 Class<GraphicsLoader> loader =  encoders.get(module);
                 graphicsLoader = getRegistry().getLoaderInstance(loader, data, target);
                 if(graphicsLoader != null) {
@@ -59,15 +61,21 @@ public class Graphics {
         HashMap<Module, Class<GraphicsLoader>> encoders = getRegistry().getEncoders();
 
         for(Module module : encoders.keySet()) {
-            if(module.isSupport(data)) {
-                data.reset();
-                Class<GraphicsLoader> loader =  encoders.get(module);
-                graphicsLoader = getRegistry().getLoaderInstance(loader, data, target);
-                if(graphicsLoader != null) {
-                    break;
+            Log.d(TAG, "module:"+module);
+            try {
+                boolean isSupport = module.isSupport(data);
+                if (isSupport) {
+                    data.reset();
+                    Class<GraphicsLoader> loader = encoders.get(module);
+                    graphicsLoader = getRegistry().getLoaderInstance(loader, data, target);
+                    if (graphicsLoader != null) {
+                        break;
+                    }
+                } else {
+                    data.reset();
                 }
-            } else {
-                data.reset();
+            } catch (Exception ignore) {
+
             }
         }
         Log.d(TAG, "graphicsLoader:"+(graphicsLoader == null ? "null":graphicsLoader));
